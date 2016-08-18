@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Catalog{% block title %}{% endblock%}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- pre-requisit for Google Sign In -->
+  <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+  <meta name="google-signin-client_id" content="173430691715-t4mdb38fq9hu8qkql3dbl054fs49dbfl.apps.googleusercontent.com">
+  {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Catalog</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+          <ul class="nav navbar-nav navbar-right">
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                  {% if not session['username'] %}
+                  Sign In
+                  <span class="caret"></span></a>
+
+                  <ul class="dropdown-menu" role="menu">
+                      <li><a href="{{ url_for('showSignIn')}}">Sign In</a></li>
+                  {% else %}
+                  <img src="{{session['picture']}}" style="width:40px; border-radius: 150px">
+                  <span class="caret"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                      <li><a href="{{ url_for('signOut')}}">Sign Out</a></li>
+                  {% endif %}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="jumbotron text-center">
+      <!-- TODO: Need to get logo to work -->
+      <h1>&#xf1c0;Catalog</h1>
+      <p>Flask/Python database backed categories project for Udacity Full Stack Developer Nanodegree</p>
+    </div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="container">
+        <div class="row">
+          <div class="col-sm-6">
+              <div class="alert alert-dismissible alert-info">
+                  <button type="button" class="close" data-dismiss="alert">&times;</button>
+                  <ul>
+                  {% for message in messages %}
+                    <li class="flash">{{message}}</li>
+                  {% endfor %}
+                  </ul>
+              </div>
+          </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>

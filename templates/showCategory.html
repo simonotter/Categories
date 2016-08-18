@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-4">
+    <h3>Categories</h3>
+    <a href="{{ url_for('newCategory') }}">Add category</a>
+    <ul class="list-group">
+        {% for cat in categories %}
+            {% if  cat.name == category.name %}
+                <li class="list-group-item active">
+                    <span class="badge">todo</span>
+                    <a href="{{ url_for('showCategory', category_name=cat.name, category_id=cat.id)}}">
+                        {{cat.name}}</a>
+                    {% if cat.user_id == session['user_id'] %}
+                        <br>
+                        <a href="{{ url_for('editCategory', category_name=category.name) }}">Edit</a> | 
+                        <a href="{{ url_for('deleteCategory', category_name=category.name) }}">Delete</a>
+                    {% endif %}
+            {% else %}
+                <li class="list-group-item">
+                    <span class="badge">todo</span>
+                    <a href="{{ url_for('showCategory', category_name=cat.name, category_id=cat.id)}}">
+                        {{cat.name}}</a>
+            {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+  </div>
+  <div class="col-sm-8">
+    <h3>{{category.name}} Items</h3>
+    ({{items|count}} {% if items|count > 1 or items|count == 0 %}results{% else %}result{% endif %})
+    <div class="list-group">
+        {% for item in items %}
+        <a href="{{ url_for('showItem', item_id=item.id)}}" class="list-group-item">
+            <h4 class="list-group-item-heading">{{item.name}}</h4>
+        </a>
+        {% else %}
+            <p>No items yet.</p>
+        {% endfor %}
+    </div>
+    <p><a href="{{ url_for('newItem') }}">Add item</a></p>
+  </div>
+</div>
+{% endblock %}

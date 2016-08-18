@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-4">
+    <h3>Categories</h3>
+    <a href="{{ url_for('newCategory') }}">Add category</a>
+    <ul class="list-group">
+        {% for category in categories %}
+            <li class="list-group-item">
+                <span class="badge">todo</span>
+                <a href="{{ url_for('showCategory', category_name=category.name)}}">
+                    {{category.name}}</a>
+            </li>
+        {% else %}
+            <p>No categories yet.</p>
+        {% endfor %}
+    </ul>
+  </div>
+  <div class="col-sm-8">
+    <h3>Latest Items</h3>
+    <p><a href="{{ url_for('newItem') }}">Add item</a></p>
+    {% for item in items %}
+        {{item.user.name}} added <a href="{{ url_for('showItem', item_id=item.id)}}">{{item.name}}</a> to <a href="{{url_for('showCategory', category_name=item.category.name)}}">{{item.category.name}}</a>.<br>
+    {% else %}
+        <p>No items yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

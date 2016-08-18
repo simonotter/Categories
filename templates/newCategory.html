@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="well">
+    {% if mode == 'edit' %}
+    <form action="{{ url_for('editCategory', category_name=category.name)}}" method="post" class="form-horizontal">
+        <fieldset>
+            <legend>Edit Category</legend>
+    {% else %}
+    <form action="{{ url_for('newCategory')}}" method="post" class="form-horizontal">
+        <fieldset>
+            <legend>Add a new Category</legend>
+    {% endif %}
+            <div class="form-group">
+                <label for="inputName" class="col-lg-2 control-label">Category</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control"
+                           id="inputName" name="name" placeholder="Enter the category name..." value="{{category.name}}">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-lg-10 col-lg-offset-2">
+                    {% if mode == 'edit' %}
+                    <a href="{{url_for('showCategory', category_name=category.name)}}" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Update Category</button>
+                    {% else %}
+                    <a href="{{url_for('showCategories')}}" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Add Category</button>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+
+
+
+{% endblock %}

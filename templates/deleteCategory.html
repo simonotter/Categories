@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h4>Are you sure you wish to delete {{category.name}}?</h4>
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-lg-10 col-lg-offset-2">
+
+                    <form method="post" action="{{ url_for('deleteCategory', category_name=category.name)}}" class="form-horizontal">
+                        {% if item_count > 0 %}
+                            <p>There are {{item_count}} item(s) in this category.</p>
+                            <div class="form-group">
+                              <label class="col-lg-2 control-label">Deletion options</label>
+                              <div class="col-lg-10">
+                                <div class="radio">
+                                  <label>
+                                    <input type="radio" name="itemOption" id="deleteAllItems" value="deleteAllItems">
+                                    Delete items in this category when category is deleted?
+                                  </label>
+                                </div>
+                                <div class="radio">
+                                  <label>
+                                    <input type="radio" name="itemOption" id="moveAllItems" value="moveAllItems" checked>
+                                    Move items to another category when category is deleted?
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group" data-dependent='{"itemOption": "moveAllItems"}'>
+                                <label for="inputCategory" class="col-lg-2 control-label">Transfer category</label>
+                                <div class="col-lg-10">
+                                    <select class="form-control" id="inputCategory" name="category">
+                                        <option>Choose a category to move the items to...</option>
+                                        <!-- TODO: Need to valid against no categories being available AND user choosing the help text option -->
+                                        <!-- TODO: If coming from category, preselect that category -->
+                                        {% for category in categories %}
+                                            {% if item and category.id == item.category.id %}
+                                            <option value="{{category.id}}" selected>{{category.name}}</option>
+                                            {% else %}
+                                                <option value="{{category.id}}">{{category.name}}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="form-group">
+                        <a href="{{url_for('showCategory', category_name=category.name)}}" class="btn btn-default">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+<script>
+$('[data-dependent]').each(function () {
+    var $ele = $(this);
+    var dependsOn = $ele.data('dependent');
+    $.each(dependsOn, function (target, value) {
+        $('[name="'+target+'"]').on('change', function () {
+            if($(this).val() === value) {
+                $ele.show();
+            }
+            else {
+                $ele.hide();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

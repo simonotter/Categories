@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-default">
+        <div class="panel-heading">{{item.name}}</div>
+        <div class="panel-body">
+            {{item.description}}<br><br>
+            {% if item.user_id == session['user_id']%}
+                <a href="{{url_for('editItem', item_id=item.id)}}">Edit</a> | <a href="{{url_for('deleteItem', item_id=item.id)}}">Delete</a>
+            {% endif %}
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
