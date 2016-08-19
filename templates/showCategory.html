@@ -14,7 +14,7 @@
                         {{cat.name}}</a>
                     {% if cat.user_id == session['user_id'] %}
                         <br>
-                        <a href="{{ url_for('editCategory', category_name=category.name) }}">Edit</a> | 
+                        <a href="{{ url_for('editCategory', category_name=category.name) }}">Edit</a> |
                         <a href="{{ url_for('deleteCategory', category_name=category.name) }}">Delete</a>
                     {% endif %}
             {% else %}
@@ -39,7 +39,7 @@
             <p>No items yet.</p>
         {% endfor %}
     </div>
-    <p><a href="{{ url_for('newItem') }}">Add item</a></p>
+    <p><a href="{{ url_for('newItem', category_id=category.id) }}">Add item</a></p>
   </div>
 </div>
 {% endblock %}

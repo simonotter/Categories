@@ -8,6 +8,7 @@ import string
 import json
 from oauth2client import client
 import requests
+import urllib2
 
 app = Flask(__name__)
 
@@ -116,7 +117,6 @@ def newCategory():
         db_session.add(category)
         db_session.commit()
         flash('New category added.')
-        # TODO: Need to flash the message
         return redirect(url_for('showCategories'))
     else:
         return render_template('newCategory.html', mode=None, category=None)
@@ -217,15 +217,27 @@ def newItem():
         return redirect(url_for('showCategories'))
     else:
         categories = db_session.query(Category).order_by(Category.name).all()
+
+        # Get the category the user came from if available
+        index = request.referrer.find('/category/')
+        if index != -1:
+            # Get the category name after the /category/ and decode it
+            category_name = urllib2.unquote(request.referrer[index+10:-1])
+            category_id = db_session.query(
+                Category).filter_by(name=category_name).one().id
+        else:
+            category_id = None
+
         return render_template('newItem.html',
-                               categories=categories, item=None)
+                               categories=categories, item=None,
+                               category_id=category_id)
 
 
 @app.route('/item/<int:item_id>/delete', methods=['GET', 'POST'])
 def deleteItem(item_id):
     if 'user_id' not in session:
         return redirect(url_for('showSignIn'))
-    item = db_session.query(Item).get(item_id).one()
+    item = db_session.query(Item).get(item_id)
     item_name = item.name
     if item.user_id != session['user_id']:
         return "<script>function myFunction() {alert('You are not authorised \
@@ -235,8 +247,6 @@ def deleteItem(item_id):
         db_session.delete(item)
         db_session.commit()
         flash('%s item deleted.' % item_name)
-        # TODO: Return user to either home or category page
-        # depending on where they were
         return redirect(url_for('showCategories'))
     else:
         return render_template('deleteItem.html', item=item)
@@ -246,7 +256,7 @@ def deleteItem(item_id):
 def editItem(item_id):
     if 'user_id' not in session:
         return redirect(url_for('showSignIn'))
-    item = db_session.query(Item).get(item_id).one()
+    item = db_session.query(Item).get(item_id)
     if item.user_id != session['user_id']:
         return "<script>function myFunction() {alert('You are not authorised \
                 to edit this item. Please create your own item \
@@ -258,8 +268,6 @@ def editItem(item_id):
         db_session.add(item)
         db_session.commit()
         flash('%s item updated.' % item.name)
-        # TODO: Return user to either home or category page
-        # depending on where they were
         return redirect(url_for('showCategories'))
     else:
         categories = db_session.query(Category).order_by(Category.name).all()

@@ -33,12 +33,16 @@
                 <select class="form-control" id="inputCategory" name="category">
                     <option>Choose a category for the item...</option>
                     <!-- TODO: Need to valid against no categories being available AND user choosing the help text option -->
-                    <!-- TODO: If coming from category, preselect that category -->
                     {% for category in categories %}
                         {% if item and category.id == item.category.id %}
                         <option value="{{category.id}}" selected>{{category.name}}</option>
                         {% else %}
-                            <option value="{{category.id}}">{{category.name}}</option>
+                            {% if category_id and category.id == category_id%}
+                            <!-- If coming from category, preselect that category -->
+                                <option value="{{category.id}}" selected>{{category.name}}</option>
+                            {% else %}
+                                <option value="{{category.id}}">{{category.name}}</option>
+                            {% endif %}
                         {% endif %}
                     {% endfor %}
                 </select>
