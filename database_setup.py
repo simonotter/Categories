@@ -1,9 +1,10 @@
 """Set up the database schema and ORM mappings.
 """
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+import datetime
 
 Base = declarative_base()
 
@@ -51,6 +52,7 @@ class Item(Base):
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+    date_added = Column(DateTime, default=datetime.datetime.now)
 
     # Allow this entity to be serialized as JSON
     @property

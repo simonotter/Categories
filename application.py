@@ -1,7 +1,7 @@
 from flask import (Flask, render_template, url_for, request, redirect, flash,
                    session, make_response, jsonify)
 from database_setup import Base, Category, Item, User
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
 import random
 import string
@@ -93,8 +93,11 @@ def signOut():
 @app.route('/categories')
 def showCategories():
     categories = db_session.query(Category).order_by(Category.name).all()
-    # TODO: Need to restrict to top ten latest (need date added)
-    items = db_session.query(Item).all()
+
+    # Get latest top ten items
+    items = db_session.query(
+        Item).order_by(desc(Item.date_added)).limit(10).all()
+
     return render_template('categories.html',
                            categories=categories,
                            items=items)
