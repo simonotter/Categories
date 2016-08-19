@@ -227,10 +227,26 @@ def newItem():
                     description=request.form['description'],
                     category_id=int(request.form['category']),
                     user_id=session['user_id'])
-        db_session.add(item)
-        db_session.commit()
-        flash('New %s item added.' % item.name)
-        return redirect(url_for('showCategories'))
+
+        # Check if a valid category has been chosen
+        # TODO:UDACITY How should I best handle preventing a user fudging
+        # the form submission to give a non-valid category_id? For example,
+        # what stops a user putting 99 in request.form['category']
+        if int(request.form['category']) != 0:
+            db_session.add(item)
+            db_session.commit()
+            flash('New %s item added.' % item.name)
+            return redirect(url_for('showCategories'))
+        else:
+            categories = db_session.query(
+                Category).order_by(Category.name).all()
+            category_id = 0
+            flash('You must choose a category.')
+            # TODO: Need to handle empty item name
+            return render_template('newItem.html',
+                                   categories=categories, item=item,
+                                   category_id=category_id)
+
     else:
         categories = db_session.query(Category).order_by(Category.name).all()
 

@@ -31,8 +31,7 @@
             <label for="inputCategory" class="col-lg-2 control-label">Category</label>
             <div class="col-lg-10">
                 <select class="form-control" id="inputCategory" name="category">
-                    <option>Choose a category for the item...</option>
-                    <!-- TODO: Need to valid against no categories being available AND user choosing the help text option -->
+                    <option value='0'>Choose a category for the item...</option>
                     {% for category in categories %}
                         {% if item and category.id == item.category.id %}
                         <option value="{{category.id}}" selected>{{category.name}}</option>
