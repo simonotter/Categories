@@ -3,6 +3,7 @@ from flask import (Flask, render_template, url_for, request, redirect, flash,
 from database_setup import Base, Category, Item, User
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
+import sqlalchemy.exc
 import random
 import string
 import json
@@ -117,10 +118,22 @@ def newCategory():
     if request.method == 'POST':
         category = Category(name=request.form['name'],
                             user_id=session['user_id'])
-        db_session.add(category)
-        db_session.commit()
-        flash('New category added.')
-        return redirect(url_for('showCategories'))
+        try:
+            db_session.add(category)
+            db_session.commit()
+            flash('New category added.')
+            return redirect(url_for('showCategories'))
+        except sqlalchemy.exc.IntegrityError, exc:
+            print 'caught exception'
+            print exc.message
+            reason = exc.message
+            if reason.find('UNIQUE constraint failed:'):
+                db_session.rollback()
+                flash("%s already exists" % exc.params[0])
+                return render_template('newCategory.html',
+                                       mode=None, category=None)
+            else:
+                return "Problem adding to category to database"
     else:
         return render_template('newCategory.html', mode=None, category=None)
 
