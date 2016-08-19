@@ -183,9 +183,22 @@ def deleteCategory(category_name):
         if 'itemOption' in request.form:
             if request.form['itemOption'] == 'moveAllItems':
                 # transfer items to new category
-                db_session.query(Item).filter_by(
-                    category_id=category.id).update(
-                        {'category_id': int(request.form['category'])})
+
+                # Check if a valid category has been chosen
+                if int(request.form['category']) != 0:
+                    db_session.query(Item).filter_by(
+                        category_id=category.id).update(
+                            {'category_id': int(request.form['category'])})
+                else:  # invalid category chosen
+                    flash('You must choose a category to move the items to.')
+                    item_count = db_session.query(Item).filter_by(
+                        category_id=category.id).count()
+                    categories = db_session.query(Category).order_by(Category.name).all()
+                    categories.remove(category)  # Remove the current category from list
+                    return render_template('deleteCategory.html',
+                                           category=category, item_count=item_count,
+                                           categories=categories)
+
             if request.form['itemOption'] == 'deleteAllItems':
                 # cascade delete items
                 db_session.query(Item).filter_by(
@@ -247,7 +260,7 @@ def newItem():
                                    categories=categories, item=item,
                                    category_id=category_id)
 
-    else:
+    else:  # 'GET' request
         categories = db_session.query(Category).order_by(Category.name).all()
 
         # Get the category the user came from if available
