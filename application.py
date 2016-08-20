@@ -143,10 +143,15 @@ def newCategory():
 @app.route("/category/<category_name>/")
 def showCategory(category_name):
     category = db_session.query(Category).filter_by(name=category_name).one()
-    categories = db_session.query(Category).order_by(Category.name).all()
+    # get all categories, ids, a count of their items and user_id
+    count_categories = db_session.query(
+        Category.name, Category.id, func.count(Item.id),
+        Category.user_id).outerjoin(Item).group_by(Category.id).all()
+
     items = db_session.query(Item).filter_by(category_id=category.id).all()
+
     return render_template('showCategory.html', category=category,
-                           categories=categories, items=items)
+                           count_categories=count_categories, items=items)
 
 
 @app.route("/category/<category_name>/edit", methods=['GET', 'POST'])

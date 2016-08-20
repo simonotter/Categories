@@ -9,7 +9,7 @@
         {% for cat_count in count_categories %}
             <li class="list-group-item">
                 {% if cat_count[1] %}
-                    <span class="badge">{{cat_count[1]}}</span>
+                    <span class="badge">{{cat_count[1]}} item{%if cat_count[1] > 1 %}s{% endif %}</span>
                 {% endif %}
 
                 <a href="{{ url_for('showCategory', category_name=cat_count[0])}}">

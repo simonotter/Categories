@@ -6,22 +6,26 @@
     <h3>Categories</h3>
     <a href="{{ url_for('newCategory') }}">Add category</a>
     <ul class="list-group">
-        {% for cat in categories %}
-            {% if  cat.name == category.name %}
+        {% for cat_count in count_categories %}
+            {% if  cat_count[0] == category.name %}
                 <li class="list-group-item active">
-                    <span class="badge">todo</span>
-                    <a href="{{ url_for('showCategory', category_name=cat.name, category_id=cat.id)}}">
-                        {{cat.name}}</a>
-                    {% if cat.user_id == session['user_id'] %}
+                    {% if cat_count[2]  %}
+                        <span class="badge">{{cat_count[2]}} item{%if cat_count[2] > 1 %}s{% endif %}</span>
+                    {% endif %}
+                    <a href="{{ url_for('showCategory', category_name=cat_count[0], category_id=cat_count[2])}}">
+                        {{cat_count[0]}}</a>
+                    {% if cat_count[3] == session['user_id'] %}
                         <br>
-                        <a href="{{ url_for('editCategory', category_name=category.name) }}">Edit</a> |
-                        <a href="{{ url_for('deleteCategory', category_name=category.name) }}">Delete</a>
+                        <a href="{{ url_for('editCategory', category_name=cat_count[0]) }}">Edit</a> |
+                        <a href="{{ url_for('deleteCategory', category_name=cat_count[0]) }}">Delete</a>
                     {% endif %}
             {% else %}
                 <li class="list-group-item">
-                    <span class="badge">todo</span>
-                    <a href="{{ url_for('showCategory', category_name=cat.name, category_id=cat.id)}}">
-                        {{cat.name}}</a>
+                    {% if cat_count[2] %}
+                        <span class="badge">{{cat_count[2]}} item{%if cat_count[2] > 1 %}s{% endif %}</span>
+                    {% endif %}
+                    <a href="{{ url_for('showCategory', category_name=cat_count[0], category_id=cat_count[2])}}">
+                        {{cat_count[0]}}</a>
             {% endif %}
             </li>
         {% endfor %}
