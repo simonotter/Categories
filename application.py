@@ -1,7 +1,7 @@
 from flask import (Flask, render_template, url_for, request, redirect, flash,
                    session, make_response, jsonify)
 from database_setup import Base, Category, Item, User
-from sqlalchemy import create_engine, desc
+from sqlalchemy import create_engine, desc, func
 from sqlalchemy.orm import sessionmaker
 import sqlalchemy.exc
 import random
@@ -93,14 +93,16 @@ def signOut():
 @app.route('/')
 @app.route('/categories')
 def showCategories():
-    categories = db_session.query(Category).order_by(Category.name).all()
+    # get all categories and a count of their items
+    count_categories = db_session.query(
+        Category.name, func.count(Item.id)).outerjoin(Item).group_by(Category.id).all()
 
     # Get latest top ten items
     items = db_session.query(
         Item).order_by(desc(Item.date_added)).limit(10).all()
 
     return render_template('categories.html',
-                           categories=categories,
+                           count_categories=count_categories,
                            items=items)
 
 

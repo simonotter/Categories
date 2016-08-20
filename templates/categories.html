@@ -6,11 +6,14 @@
     <h3>Categories</h3>
     <a href="{{ url_for('newCategory') }}">Add category</a>
     <ul class="list-group">
-        {% for category in categories %}
+        {% for cat_count in count_categories %}
             <li class="list-group-item">
-                <span class="badge">todo</span>
-                <a href="{{ url_for('showCategory', category_name=category.name)}}">
-                    {{category.name}}</a>
+                {% if cat_count[1] %}
+                    <span class="badge">{{cat_count[1]}}</span>
+                {% endif %}
+
+                <a href="{{ url_for('showCategory', category_name=cat_count[0])}}">
+                    {{cat_count[0]}}</a>
             </li>
         {% else %}
             <p>No categories yet.</p>
