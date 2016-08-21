@@ -95,7 +95,8 @@ def signOut():
 def showCategories():
     # get all categories and a count of their items
     count_categories = db_session.query(
-        Category.name, func.count(Item.id)).outerjoin(Item).group_by(Category.id).all()
+        Category.name, func.count(Item.id)).outerjoin(Item).group_by(
+            Category.id).all()
 
     # Get latest top ten items
     items = db_session.query(
@@ -200,10 +201,13 @@ def deleteCategory(category_name):
                     flash('You must choose a category to move the items to.')
                     item_count = db_session.query(Item).filter_by(
                         category_id=category.id).count()
-                    categories = db_session.query(Category).order_by(Category.name).all()
-                    categories.remove(category)  # Remove the current category from list
+                    categories = db_session.query(
+                        Category).order_by(Category.name).all()
+                    # Remove the current category from list
+                    categories.remove(category)
                     return render_template('deleteCategory.html',
-                                           category=category, item_count=item_count,
+                                           category=category,
+                                           item_count=item_count,
                                            categories=categories)
 
             if request.form['itemOption'] == 'deleteAllItems':
