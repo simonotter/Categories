@@ -242,6 +242,23 @@ def showItemJSON(item_id):
     return jsonify(item=item.serialize)
 
 
+def validateItemForm():
+    errors = {}
+    # Check if a valid category has been chosen
+    # TODO:UDACITY How should I best handle preventing a user fudging
+    # the form submission to give a non-valid category_id? For example,
+    # what stops a user putting 99 in request.form['category']
+    if int(request.form['category']) == 0:
+        category_id = 0
+        errors['category'] = 'You must choose a category.'
+    else:
+        category_id = int(request.form['category'])
+    # validate item name
+    if request.form['name'] == "":
+        errors['name'] = 'You must provide an item name.'
+    return errors, category_id
+
+
 @app.route("/item/new", methods=['GET', 'POST'])
 def newItem():
     if 'user_id' not in session:
@@ -252,11 +269,8 @@ def newItem():
                     category_id=int(request.form['category']),
                     user_id=session['user_id'])
 
-        # Check if a valid category has been chosen
-        # TODO:UDACITY How should I best handle preventing a user fudging
-        # the form submission to give a non-valid category_id? For example,
-        # what stops a user putting 99 in request.form['category']
-        if int(request.form['category']) != 0:
+        errors, category_id = validateItemForm()
+        if not errors:
             db_session.add(item)
             db_session.commit()
             flash('New %s item added.' % item.name)
@@ -264,12 +278,9 @@ def newItem():
         else:
             categories = db_session.query(
                 Category).order_by(Category.name).all()
-            category_id = 0
-            flash('You must choose a category.')
-            # TODO: Need to handle empty item name
             return render_template('newItem.html',
                                    categories=categories, item=item,
-                                   category_id=category_id)
+                                   category_id=category_id, errors=errors)
 
     else:  # 'GET' request
         categories = db_session.query(Category).order_by(Category.name).all()
@@ -286,7 +297,7 @@ def newItem():
 
         return render_template('newItem.html',
                                categories=categories, item=None,
-                               category_id=category_id)
+                               category_id=category_id, errors=None)
 
 
 @app.route('/item/<int:item_id>/delete', methods=['GET', 'POST'])
@@ -317,18 +328,31 @@ def editItem(item_id):
         return "<script>function myFunction() {alert('You are not authorised \
                 to edit this item. Please create your own item \
                 in order to edit.');}</script><body onload='myFunction()'>"
+
     if request.method == 'POST':
         item.name = request.form['name']
         item.description = request.form['description']
         item.category_id = int(request.form['category'])
-        db_session.add(item)
-        db_session.commit()
-        flash('%s item updated.' % item.name)
-        return redirect(url_for('showCategories'))
-    else:
+
+        errors, category_id = validateItemForm()
+        # if valid form, then update item
+        if not errors:
+            db_session.add(item)
+            db_session.commit()
+            flash('%s item updated.' % item.name)
+            return redirect(url_for('showCategories'))
+        else:
+            categories = db_session.query(
+                Category).order_by(Category.name).all()
+            return render_template('newItem.html',
+                                   categories=categories, item=item,
+                                   mode='edit', category_id=category_id,
+                                   errors=errors)
+
+    else:  # 'GET' request
         categories = db_session.query(Category).order_by(Category.name).all()
         return render_template('newItem.html', categories=categories,
-                               item=item, mode='edit')
+                               item=item, mode='edit', errors=None)
 
 
 def createUser():

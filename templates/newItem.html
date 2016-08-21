@@ -11,12 +11,15 @@
         <fieldset>
             <legend>Add a new Item</legend>
         {% endif %}
-        <div class="form-group">
+        <div class="form-group {% if errors['name'] %} has-error {% endif %}">
             <label for="inputName" class="col-lg-2 control-label">Name</label>
             <div class="col-lg-10">
                 <input type="text" class="form-control"
                        id="inputNmae" name="name" placeholder="Enter the item name..."
                        value="{{item.name}}">
+                {% if errors['name'] %}
+                <label class="control-label" for="inputError">{{errors['name']}}</label>
+                {% endif %}
             </div>
         </div>
         <div class="form-group">
@@ -24,10 +27,9 @@
           <div class="col-lg-10">
             <textarea class="form-control" rows="3"  placeholder="Describe the item..."
                 name="description" id="inputDescription">{{item.description}}</textarea>
-            <span class="help-block">Enter a detailed description of the item.</span>
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group {% if errors['category'] %} has-error {% endif %}">
             <label for="inputCategory" class="col-lg-2 control-label">Category</label>
             <div class="col-lg-10">
                 <select class="form-control" id="inputCategory" name="category">
@@ -45,6 +47,9 @@
                         {% endif %}
                     {% endfor %}
                 </select>
+                {% if errors['category'] %}
+                <label class="control-label" for="inputError">{{errors['category']}}</label>
+                {% endif %}
             </div>
         </div>
         <div class="form-group">
