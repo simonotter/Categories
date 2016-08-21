@@ -114,31 +114,44 @@ def categoriesJSON():
     return jsonify(categories=[category.serialize for category in categories])
 
 
+def validateCategoryForm():
+    errors = {}
+    if request.form['name'] == '':
+        errors['name'] = 'You must provide an item name.'
+    return errors
+
+
 @app.route("/category/new", methods=['GET', 'POST'])
 def newCategory():
     if 'user_id' not in session:
         return redirect(url_for('showSignIn'))
     if request.method == 'POST':
-        category = Category(name=request.form['name'],
-                            user_id=session['user_id'])
-        try:
-            db_session.add(category)
-            db_session.commit()
-            flash('New category added.')
-            return redirect(url_for('showCategories'))
-        except sqlalchemy.exc.IntegrityError, exc:
-            print 'caught exception'
-            print exc.message
-            reason = exc.message
-            if reason.find('UNIQUE constraint failed:'):
-                db_session.rollback()
-                flash("%s already exists" % exc.params[0])
-                return render_template('newCategory.html',
-                                       mode=None, category=None)
-            else:
-                return "Problem adding to category to database"
+        errors = validateCategoryForm()
+
+        if not errors:
+            category = Category(name=request.form['name'],
+                                user_id=session['user_id'])
+            try:
+                db_session.add(category)
+                db_session.commit()
+                flash('New category added.')
+                return redirect(url_for('showCategories'))
+            except sqlalchemy.exc.IntegrityError, exc:
+                reason = exc.message
+                if reason.find('UNIQUE constraint failed:'):
+                    db_session.rollback()
+                    errors['name'] = "%s already exists" % exc.params[0]
+                    return render_template('newCategory.html',
+                                           mode=None, category=None,
+                                           errors=errors)
+                else:
+                    return "Problem adding to category to database"
+        else:  # errors
+            return render_template('newCategory.html', mode=None,
+                                   category=None, errors=errors)
     else:
-        return render_template('newCategory.html', mode=None, category=None)
+        return render_template('newCategory.html', mode=None,
+                               category=None, errors=None)
 
 
 @app.route("/category/<category_name>/")
@@ -159,21 +172,30 @@ def showCategory(category_name):
 def editCategory(category_name):
     if 'user_id' not in session:
         return redirect(url_for('showSignIn'))
+
     category = db_session.query(Category).filter_by(name=category_name).one()
+
     if session['user_id'] != category.user_id:
         return "<script>function myFunction() {alert('You are not authorised \
                 to edit this category. Please create your own category \
                 in order to edit.');}</script><body onload='myFunction()'>"
 
     if request.method == 'POST':
-        category.name = request.form['name']
-        db_session.add(category)
-        db_session.commit()
-        flash('Category %s has been updated.' % category.name)
-        return redirect(url_for('showCategories'))
+
+        errors = validateCategoryForm()
+        if not errors:
+            category.name = request.form['name']
+            db_session.add(category)
+            db_session.commit()
+            flash('Category %s has been updated.' % category.name)
+            return redirect(url_for('showCategories'))
+        else:
+            return render_template('newCategory.html', mode='edit',
+                                   category=category, errors=errors)
+
     else:
         return render_template('newCategory.html',
-                               category=category, mode='edit')
+                               category=category, mode='edit', errors=None)
 
 
 @app.route("/category/<category_name>/delete", methods=['GET', 'POST'])
