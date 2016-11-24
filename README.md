@@ -25,7 +25,7 @@ Simon Otter
 1. Install PostgreSQL: ```sudo apt-get -y install postgresql postgresql-contrib```.
 2. Configure PostgreSQL user: ```sudo su && su - postgres```.
 3. Access the PostgreSQL prompt: ```psql```.
-4. Change the pssword for postgres role by typing:
+4. Change the password for postgres role by typing:
 ```
 \password postgres
 ENTER YOUR PASSWORD
@@ -56,35 +56,39 @@ ENTER YOUR PASSWORD
 21. Restart Apache: ```sudo service apache2 restart```
 22. Visit your website to check the categories app is being served.
 
-####categoreisapp.wsgi file
->#!/usr/bin/python
->import sys
->import logging
->logging.basicConfig(stream=sys.stderr)
->sys.path.insert(0,"/var/www/categories/")
->
->from categories import app as application
->application.secret_key = 'Add your secret key'
+#### The categoreisapp.wsgi file
+```python
+#!/usr/bin/python
+import sys
+import logging
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0,"/var/www/categories/")
 
-####categoriesapp.conf file
-><VirtualHost *:80>
->                ServerName 35.161.55.89
->                ServerAdmin admin@mywebsite.com
->                ServerAlias ec2-35-161-55-89.us-west-2.compute.amazonaws.com
->                WSGIScriptAlias / /var/www/categories/categoriesapp.wsgi
->                <Directory /var/www/categories/categories/>
->                        Order allow,deny
->                        Allow from all
->                </Directory>
->                Alias /static /var/www/categories/categories/static
->                <Directory /var/www/categories/categories/static/>
->                        Order allow,deny
->                        Allow from all
->                </Directory>
->                ErrorLog ${APACHE_LOG_DIR}/error.log
->                LogLevel warn
->                CustomLog ${APACHE_LOG_DIR}/access.log combined
-></VirtualHost>
+from categories import app as application
+application.secret_key = 'Add your secret key'
+```
+
+#### The categoriesapp.conf file
+```xml
+<VirtualHost *:80>
+                ServerName 35.161.55.89
+                ServerAdmin admin@mywebsite.com
+                ServerAlias ec2-35-161-55-89.us-west-2.compute.amazonaws.com
+                WSGIScriptAlias / /var/www/categories/categoriesapp.wsgi
+                <Directory /var/www/categories/categories/>
+                        Order allow,deny
+                        Allow from all
+                </Directory>
+                Alias /static /var/www/categories/categories/static
+                <Directory /var/www/categories/categories/static/>
+                        Order allow,deny
+                        Allow from all
+                </Directory>
+                ErrorLog ${APACHE_LOG_DIR}/error.log
+                LogLevel warn
+                CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
 
 ## References and Acknowledgements
 1. [How To Deploy a Flask Application on an Ubuntu VPS](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps)
