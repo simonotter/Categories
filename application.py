@@ -396,6 +396,6 @@ def getUserID(google_id):
 
 
 if __name__ == "__main__":
-    app.debug = True
+    app.debug = False
     app.secret_key = 'Ea02p59M05PiixSw37x3Q5E6w7E8GW79'
     app.run(host='0.0.0.0', port=5000)
